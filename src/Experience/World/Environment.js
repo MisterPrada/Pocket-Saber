@@ -12,14 +12,28 @@ export default class Environment
 
         this.scene.colorSpace = THREE.SRGBColorSpace
 
-        //this.setAmbientLight()
+        this.setAmbientLight()
+        this.setdirectionalLight()
 
         this.setDebug()
     }
 
     setAmbientLight() {
-        this.ambientLight = new THREE.AmbientLight('#ffffff', 0.05)
+        this.ambientLight = new THREE.AmbientLight('#ffffff', 2.)
         this.scene.add(this.ambientLight)
+    }
+
+    setdirectionalLight() {
+        this.directionalLight = new THREE.DirectionalLight('#ffffff', 3)
+        this.directionalLight.castShadow = true
+        this.directionalLight.shadow.mapSize.set(1024, 1024)
+        this.directionalLight.shadow.camera.far = 15
+        this.directionalLight.shadow.camera.left = - 7
+        this.directionalLight.shadow.camera.top = 7
+        this.directionalLight.shadow.camera.right = 7
+        this.directionalLight.shadow.camera.bottom = - 7
+        this.directionalLight.position.set(5, 5, 5)
+        this.scene.add(this.directionalLight)
     }
 
 

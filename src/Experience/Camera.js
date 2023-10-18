@@ -24,12 +24,13 @@ export default class Camera
     setInstance()
     {
         this.instance = new THREE.PerspectiveCamera(25, this.sizes.width / this.sizes.height, 0.1, 300)
-        this.defaultCameraPosition = new THREE.Vector3(0.0, 0.0, 4);
+        this.defaultCameraPosition = new THREE.Vector3(0.0, 0.0, 8);
 
         this.instance.position.copy(this.defaultCameraPosition)
-        this.instance.lookAt(new THREE.Vector3(0, 0, 0));
+        this.instance.lookAt(new THREE.Vector3(0, 1., 0));
 
         this.lerpVector.copy(this.instance.position);
+
 
         this.scene.add(this.instance)
     }

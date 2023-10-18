@@ -5,14 +5,21 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "handshake": "node handshake.js"
   },
   "devDependencies": {
     "@vitejs/plugin-basic-ssl": "^1.0.1",
+    "create-server": "^1.0.2",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
+    "qrcode": "^1.5.3",
     "three": "^0.156.1",
-    "vite": "^4.4.9",
+    "vite": "^4.5.0",
     "vite-plugin-glsl": "^1.0.2",
-    "vite-plugin-glslify": "^2.0.2"
+    "vite-plugin-glslify": "^2.0.2",
+    "ws": "^8.14.2"
   },
   "dependencies": {
     "gsap": "^3.7.1",
