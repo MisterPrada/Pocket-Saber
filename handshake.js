@@ -2,6 +2,8 @@ import fs from 'fs';
 import express from 'express';
 import { createServer } from 'https';
 import WebSocket, { WebSocketServer } from 'ws';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
@@ -22,6 +24,6 @@ wss.on('connection', (ws) => {
     });
 });
 
-server.listen(3033, '192.168.0.179' , () => {
+server.listen(process.env.SOCKET_PORT, process.env.SOCKET_HOST , () => {
     console.log('WebSocket Secure server running');
 });

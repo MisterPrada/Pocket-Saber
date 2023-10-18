@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 
+import WebRTC from "./Utils/WebRTC.js";
+
 import Debug from './Utils/Debug.js'
 import Sizes from './Utils/Sizes.js'
 import Time from './Utils/Time.js'
@@ -25,6 +27,9 @@ export default class Experience
             return instance
         }
         instance = this
+
+        // WebRTC
+        this.webrtc = new WebRTC()
 
         // Global access
         window.experience = this
