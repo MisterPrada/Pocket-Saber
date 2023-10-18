@@ -1,0 +1,22 @@
+{
+  "name": "predator-misterprada",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^1.0.1",
+    "three": "^0.156.1",
+    "vite": "^4.4.9",
+    "vite-plugin-glsl": "^1.0.2",
+    "vite-plugin-glslify": "^2.0.2"
+  },
+  "dependencies": {
+    "gsap": "^3.7.1",
+    "stats.js": "^0.17.0",
+    "tweakpane": "^4.0.1"
+  }
+}
