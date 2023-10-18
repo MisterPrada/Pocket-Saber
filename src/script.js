@@ -35,8 +35,9 @@ const isMobile = {
 import Experience from './Experience/Experience.js'
 import QRCode from 'qrcode'
 
-const experience = new Experience(document.querySelector('canvas.webgl'))
-
+if ( !isMobile.any() ) {
+    new Experience(document.querySelector('canvas.webgl'))
+}
 
 
 const output = document.getElementById('output');
@@ -53,8 +54,7 @@ const dc = pc.createDataChannel("chat", {
 const log = (msg) => {
     output.innerHTML += `<br>${msg}`
 };
-dc.onopen = () => chat.select();
-
+dc.onopen = () => { };
 dc.onclose = () => log(`Closed`);
 dc.onerror = err => log(`Error: ${err}`);
 
@@ -71,77 +71,14 @@ dc.onmessage = e => {
 }
 pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
 
-
-chat.onkeypress = function(e) {
-    if (e.keyCode != 13) return;
-    dc.send(chat.value);
-    log(chat.value);
-    chat.value = "";
-};
-
-async function createOffer() {
-    button.disabled = true;
-    await pc.setLocalDescription(await pc.createOffer());
-    pc.onicecandidate = ({
-                             candidate
-                         }) => {
-        if (candidate) return;
-        offer.value = pc.localDescription.sdp;
-        offer.select();
-        answer.placeholder = "Paste answer here. And Press Enter";
-    };
-}
-
-offer.onkeypress = async function(e) {
-    if (e.keyCode != 13 || pc.signalingState != "stable") return;
-    button.disabled = offer.disabled = true;
-    await pc.setRemoteDescription({
-        type: "offer",
-        sdp: offer.value
-    });
-    await pc.setLocalDescription(await pc.createAnswer());
-    pc.onicecandidate = ({
-                             candidate
-                         }) => {
-        if (candidate) return;
-        answer.focus();
-        answer.value = pc.localDescription.sdp;
-        answer.select();
-    };
-};
-
-answer.onkeypress = function(e) {
-    if (e.keyCode != 13 || pc.signalingState != "have-local-offer") return;
-    answer.disabled = true;
-    pc.setRemoteDescription({
-        type: "answer",
-        sdp: answer.value
-    });
-};
-
 pc.onconnectionstatechange = ev => handleChange();
 pc.oniceconnectionstatechange = ev => handleChange();
 
 function handleChange() {
-    let stat = 'ConnectionState: <strong>' + pc.connectionState + '</strong> IceConnectionState: <strong>' + pc.iceConnectionState + '</strong>';
-    document.getElementById('stat').innerHTML = stat;
     console.log('%c' + new Date().toISOString() + ': ConnectionState: %c' + pc.connectionState + ' %cIceConnectionState: %c' + pc.iceConnectionState,
         'color:yellow', 'color:orange', 'color:yellow', 'color:orange');
 }
 handleChange();
-
-document.getElementById('button').onclick = () => {
-    createOffer()
-}
-
-
-const print = ( message, selector ) => {
-    const span = document.createElement( 'span' );
-
-    span.innerHTML = message + `</br>`;
-
-    document.getElementById( selector ).innerHTML = message + `</br>`
-}
 
 function requestDeviceOrientation () {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -171,59 +108,17 @@ function requestDeviceOrientation () {
                         // to string
                         const string = JSON.stringify(data)
                         dc.send(string);
-
-                        //print( `${ alpha }, ${ beta } ${ gamma }`, 'device-orientation-event' )
                     });
                 }
             })
             .catch(console.error);
     } else {
         // handle regular non iOS 13+ devices
-        console.log ("not iOS");
+        //console.log ("not iOS");
     }
 }
-
-function requestDeviceMotion () {
-    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-        DeviceMotionEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    window.addEventListener('devicemotion', (event) => {
-                        const acceleration = event.accelerationIncludingGravity;
-
-                        const x = event.acceleration.x;
-                        const y = event.acceleration.y;
-                        const z = event.acceleration.z;
-
-                        // to JSON
-                        const data = {
-                            motion: {
-                                x,
-                                y,
-                                z
-                            }
-                        }
-
-                        // to string
-                        const string = JSON.stringify(data)
-                        dc.send(string);
-                    });
-                }
-            })
-            .catch(console.error);
-    } else {
-        // handle regular non iOS 13+ devices
-        console.log ("not iOS");
-    }
-}
-
 
 requestDeviceOrientation()
-requestDeviceMotion()
-// document.getElementById('enable').addEventListener('click', () => {
-//     requestDeviceOrientation();
-// });
-
 
 
 const ws = new WebSocket(`wss://192.168.0.179:3033`);
@@ -238,9 +133,7 @@ if(!isMobile.any()) {
 }
 
 // ws send message
-ws.onopen = () => {
-
-};
+ws.onopen = () => {};
 
 ws.onmessage = async (message) => {
     if (isMobile.any()) {

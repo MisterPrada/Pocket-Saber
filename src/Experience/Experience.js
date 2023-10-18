@@ -111,9 +111,16 @@ export default class Experience
     }
 
     setDefaultCode(){
+        // disable double tap zoom
         document.ondblclick = function (e) {
             e.preventDefault()
         }
+
+        //disable zoom
+        document.addEventListener('touchmove', function (event) {
+            if (event.scale !== 1) { event.preventDefault(); }
+        }, { passive: false });
+
 
         gsap.registerPlugin(MotionPathPlugin);
     }
