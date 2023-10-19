@@ -40,11 +40,31 @@ export default class Sound extends EventEmitter
         this.listener = new THREE.AudioListener();
         this.camera.add( this.listener );
 
-        this.backgroundSound = new THREE.Audio( this.listener );
-        this.backgroundSound.setBuffer( this.resources.items.backgroundSound );
-        this.backgroundSound.setLoop( true );
-        this.backgroundSound.setVolume( 0.8 );
-        this.backgroundSound.play();
+        // this.backgroundSound = new THREE.Audio( this.listener );
+        // this.backgroundSound.setBuffer( this.resources.items.backgroundSound );
+        // this.backgroundSound.setLoop( true );
+        // this.backgroundSound.setVolume( 0.8 );
+        // this.backgroundSound.play();
+
+        this.saberIdleSound = new THREE.Audio( this.listener );
+        this.saberIdleSound.setBuffer( this.resources.items.saberIdleSound );
+        this.saberIdleSound.setLoop( true );
+        this.saberIdleSound.setVolume( 0.8 );
+
+        this.saberOpenSound = new THREE.Audio( this.listener );
+        this.saberOpenSound.setBuffer( this.resources.items.saberOpenSound );
+        this.saberOpenSound.setLoop( false );
+        this.saberOpenSound.setVolume( 0.8 );
+
+        this.saberLeftSound = new THREE.Audio( this.listener );
+        this.saberLeftSound.setBuffer( this.resources.items.saberLeftSound );
+        this.saberLeftSound.setLoop( false );
+        this.saberLeftSound.setVolume( 0.8 );
+
+        this.saberRightSound = new THREE.Audio( this.listener );
+        this.saberRightSound.setBuffer( this.resources.items.saberRightSound );
+        this.saberRightSound.setLoop( false );
+        this.saberRightSound.setVolume( 0.8 );
 
 
         this.soundsCreated = true;

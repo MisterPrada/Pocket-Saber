@@ -1,9 +1,24 @@
 export default [
-    // {
-    //     name: 'backgroundSound',
-    //     type: 'audio',
-    //     path: 'sounds/background.mp3'
-    // },
+    {
+        name: 'saberIdleSound',
+        type: 'audio',
+        path: 'sounds/saber_idle.mp3'
+    },
+    {
+        name: 'saberOpenSound',
+        type: 'audio',
+        path: 'sounds/saber_open.mp3'
+    },
+    {
+        name: 'saberLeftSound',
+        type: 'audio',
+        path: 'sounds/saber_left.mp3'
+    },
+    {
+        name: 'saberRightSound',
+        type: 'audio',
+        path: 'sounds/saber_right.mp3'
+    },
     {
         name: 'lightSaberModel',
         type: 'gltfModel',

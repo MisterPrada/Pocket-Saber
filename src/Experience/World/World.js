@@ -22,9 +22,10 @@ export default class World
                 this.experience.time.elapsed = 0
 
                 // Setup
+                this.sound.createSounds()
+
                 this.saber = new Saber()
                 this.environment = new Environment()
-
                 // Remove preloader
 
                 // Animation timeline

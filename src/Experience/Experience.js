@@ -28,6 +28,12 @@ export default class Experience
         }
         instance = this
 
+        // Options
+        this.targetElement = _canvas
+        this.setDefaultCode();
+        this.setConfig()
+        this.isMobile = isMobile.any()
+
         // WebRTC
         this.webrtc = new WebRTC()
 
@@ -39,8 +45,6 @@ export default class Experience
         this.html.preloader = document.getElementById("preloader")
         this.html.playButton = document.getElementById("play-button")
 
-        // Options
-        this.targetElement = _canvas
 
         if(!this.targetElement)
         {
@@ -69,12 +73,6 @@ export default class Experience
         this.sound = new Sound()
         this.world = new World()
 
-
-        /**
-         * Default code to prevent double click to select text
-         */
-        this.setDefaultCode();
-        this.setConfig()
 
         // Resize event
         this.sizes.on('resize', () =>
@@ -107,6 +105,8 @@ export default class Experience
 
     update()
     {
+        if (this.isMobile )
+            return
         if ( this.debug.active )
             this.debug.panel.refresh()
         this.timeline.time(this.time.elapsed);
@@ -116,6 +116,27 @@ export default class Experience
     }
 
     setDefaultCode(){
+        window.isMobile = {
+            Android: function() {
+                return navigator.userAgent.match(/Android/i);
+            },
+            BlackBerry: function() {
+                return navigator.userAgent.match(/BlackBerry/i);
+            },
+            iOS: function() {
+                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            },
+            Opera: function() {
+                return navigator.userAgent.match(/Opera Mini/i);
+            },
+            Windows: function() {
+                return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+            },
+            any: function() {
+                return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+            }
+        };
+
         // disable double tap zoom
         document.ondblclick = function (e) {
             e.preventDefault()
