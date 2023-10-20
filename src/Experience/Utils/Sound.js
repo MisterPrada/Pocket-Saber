@@ -50,6 +50,8 @@ export default class Sound extends EventEmitter
         this.saberIdleSound.setBuffer( this.resources.items.saberIdleSound );
         this.saberIdleSound.setLoop( true );
         this.saberIdleSound.setVolume( 0.8 );
+        //this.saberIdleSound.playbackRate = 1.0;
+
 
         this.saberOpenSound = new THREE.Audio( this.listener );
         this.saberOpenSound.setBuffer( this.resources.items.saberOpenSound );

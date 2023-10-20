@@ -39,9 +39,11 @@ export default class Saber {
                     this.sound.saberIdleSound.play()
                 }
             });
-            // document.getElementById('saber').addEventListener('click', () => {
-            //     this.animation.actions.open.play()
-            // });
+            document.getElementById('saber').addEventListener('click', () => {
+                this.animation.actions.open.play()
+                this.sound.saberOpenSound.play()
+                this.sound.saberIdleSound.play()
+            });
         }
 
     }
@@ -66,15 +68,6 @@ export default class Saber {
         this.group.add(this.model)
 
         this.scene.add(this.group)
-
-        this.direction = new THREE.Vector3()
-        this.velocity = new THREE.Vector3()
-        this.center = new THREE.Vector3(0, 0, 0)
-        this.radius = 3
-
-        this.ACCELERATION_CONSTANT = 0.1
-        this.LERP_FACTOR = 0.1
-        this.CENTER_PULL_FACTOR = 0.001
     }
 
     setAnimation() {
@@ -114,7 +107,6 @@ export default class Saber {
         if ( this.animation )
             this.animation.mixer.update(this.time.delta)
 
-
         // deviceorientation to quaternion
         var alpha = THREE.MathUtils.degToRad(window.god.orientation.alpha); // z-axis rotation [0, 360)
         var beta = THREE.MathUtils.degToRad(window.god.orientation.beta);  // x-axis rotation [-180, 180)
@@ -123,55 +115,9 @@ export default class Saber {
         var quaternion = new THREE.Quaternion();
         var euler = new THREE.Euler();
 
-        // Можно также учесть ориентацию экрана, если это необходимо
-        //var orient = THREE.MathUtils.degToRad(screen.orientation.angle);
-
-        // Заметьте, что порядок 'ZXY' относится к порядку, в котором Euler будет применять вращения
-        euler.set(beta, alpha, -gamma, 'YXZ'); // 'YXZ' для портретной ориентации устройства
+        euler.set(beta, alpha, -gamma, 'YXZ');
         quaternion.setFromEuler(euler);
 
-        this.group.quaternion.copy(quaternion)
-
-
-
-
-        //
-        // var x = window.god.motion.x * 0.01;
-        // var y = window.god.motion.y * 0.01;
-        // var z = window.god.motion.z * 0.01;
-        // var interval = window.god.motion.interval;
-        //
-        // var deltaPosition = new THREE.Vector3(x, y, z);
-        //
-        //
-        // // Обновляем вектор направления на основе данных акселерометра
-        // this.direction.set(x, y, z);
-        //
-        // // Интеграция ускорения для получения скорости
-        // this.velocity.addScaledVector(this.direction, this.ACCELERATION_CONSTANT * 50);
-        //
-        // // Добавляем "притягивающую" силу, направленную к центру
-        // const centerPull = this.center.clone().sub(this.group.position).multiplyScalar(this.CENTER_PULL_FACTOR);
-        // this.velocity.add(centerPull);
-        //
-        // // Применяем трение к скорости
-        // this.velocity.multiplyScalar(0.90);
-        //
-        // if (this.velocity.length() > 2) {
-        //     this.velocity.normalize().multiplyScalar(2);
-        // }
-        //
-        // const newPosition = this.group.position.clone().addScaledVector(this.velocity, 0.001);
-        //
-        // // Ограничиваем движение в пределах сферы
-        // if (newPosition.distanceTo(this.center) > this.radius) {
-        //     newPosition.sub(this.center).normalize().multiplyScalar(this.radius).add(this.center);
-        // }
-        //
-        //
-        // // Используем lerp для плавного движения к новой позиции
-        // this.group.position.lerp(newPosition, this.LERP_FACTOR);
-        //
-        // this.group.updateMatrix();
+        this.group.quaternion.copy(quaternion);
     }
 }

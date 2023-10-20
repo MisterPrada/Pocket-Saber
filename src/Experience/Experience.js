@@ -29,6 +29,7 @@ export default class Experience
         instance = this
 
         // Options
+        this.debug = new Debug()
         this.targetElement = _canvas
         this.setDefaultCode();
         this.setConfig()
@@ -63,7 +64,6 @@ export default class Experience
         this.timeline = gsap.timeline({
             paused: true,
         });
-        this.debug = new Debug()
         this.sizes = new Sizes()
         this.time = new Time()
         this.cursor = { x: 0, y: 0 }
@@ -105,7 +105,7 @@ export default class Experience
 
     update()
     {
-        if (this.isMobile )
+        if ( this.isMobile )
             return
         if ( this.debug.active )
             this.debug.panel.refresh()
