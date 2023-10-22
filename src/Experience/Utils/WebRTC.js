@@ -7,7 +7,7 @@ export default class WebRTC {
         this.handshakeId = this.uuid();
         //this.handshakeId = 'misterprada';
 
-        window.god = {
+        this.data = {
             orientation: {
                 alpha: 63.0,
                 beta: 120.0,
@@ -152,11 +152,11 @@ export default class WebRTC {
             let data = JSON.parse(e.data)
 
             if( data.orientation ) {
-                window.god.orientation = data.orientation;
+                this.data.orientation = data.orientation;
             }
 
             if( data.motion ) {
-                window.god.motion = data.motion;
+                this.data.motion = data.motion;
             }
         }
         pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
@@ -174,7 +174,7 @@ export default class WebRTC {
 
         document.getElementById('permissions').addEventListener('click', this.requestAccessToDeviceSensors)
         document.getElementById('calibrate').addEventListener('click', () => {
-            if (typeof DeviceOrientationEvent !== 'undefined' && window.god.orientation) {
+            if (typeof DeviceOrientationEvent !== 'undefined' && this.data.orientation) {
                 window.removeEventListener('deviceorientation', this.handleDeviceOrientation, true);
                 window.addEventListener('deviceorientation', this.handleDeviceOrientation, true);
             }
@@ -227,11 +227,11 @@ export default class WebRTC {
             let data = JSON.parse(e.data)
 
             if( data.orientation ) {
-                window.god.orientation = data.orientation;
+                this.data.orientation = data.orientation;
             }
 
             if( data.motion ) {
-                window.god.motion = data.motion;
+                this.data.motion = data.motion;
             }
         }
         pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
@@ -263,7 +263,7 @@ export default class WebRTC {
         this.requestAccessToDeviceSensors()
 
         document.getElementById('calibrate').addEventListener('click', () => {
-            if (typeof DeviceOrientationEvent !== 'undefined' && window.god.orientation) {
+            if (typeof DeviceOrientationEvent !== 'undefined' && this.data.orientation) {
                 window.removeEventListener('deviceorientation', this.handleDeviceOrientation, true);
                 window.addEventListener('deviceorientation', this.handleDeviceOrientation, true);
             }

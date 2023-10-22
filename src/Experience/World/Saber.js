@@ -11,6 +11,7 @@ export default class Saber {
         this.renderer = this.experience.renderer.instance
         this.resources = this.experience.resources
         this.sound = this.experience.sound
+        this.webRTC = this.experience.webrtc
 
         this.createModel()
         this.setAnimation()
@@ -108,9 +109,9 @@ export default class Saber {
             this.animation.mixer.update(this.time.delta)
 
         // deviceorientation to quaternion
-        var alpha = THREE.MathUtils.degToRad(window.god.orientation.alpha); // z-axis rotation [0, 360)
-        var beta = THREE.MathUtils.degToRad(window.god.orientation.beta);  // x-axis rotation [-180, 180)
-        var gamma = THREE.MathUtils.degToRad(window.god.orientation.gamma); // y-axis rotation [-90, 90)
+        var alpha = THREE.MathUtils.degToRad(this.webRTC.data.orientation.alpha); // z-axis rotation [0, 360)
+        var beta = THREE.MathUtils.degToRad(this.webRTC.data.orientation.beta);  // x-axis rotation [-180, 180)
+        var gamma = THREE.MathUtils.degToRad(this.webRTC.data.orientation.gamma); // y-axis rotation [-90, 90)
 
         var quaternion = new THREE.Quaternion();
         var euler = new THREE.Euler();
