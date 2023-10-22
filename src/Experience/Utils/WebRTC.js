@@ -5,6 +5,7 @@ export default class WebRTC {
     constructor() {
         this.experience = new Experience();
         this.handshakeId = this.uuid();
+        //this.handshakeId = 'misterprada';
 
         window.god = {
             orientation: {
@@ -21,9 +22,9 @@ export default class WebRTC {
         }
 
         this.config = {
-            iceServers: [{
-                urls: "stun:stun.l.google.com:19302" // list of free STUN servers: https://gist.github.com/zziuni/3741933
-            }]
+            // iceServers: [{
+            //     urls: "stun:stun.l.google.com:19302" // list of free STUN servers: https://gist.github.com/zziuni/3741933
+            // }]
         };
 
         //this.initWebSocket()
@@ -241,7 +242,7 @@ export default class WebRTC {
             console.log('%c' + new Date().toISOString() + ': ConnectionState: %c' + pc.connectionState + ' %cIceConnectionState: %c' + pc.iceConnectionState,
                 'color:yellow', 'color:orange', 'color:yellow', 'color:orange');
 
-            if(pc.connectionState === 'connecting' && pc.signalingState != 'stable') {
+            if(pc.connectionState === 'connecting' && pc.signalingState != 'stable' && !this.experience.isMobile) {
                 const response = await fetch(__HANDSHAKE_HOST__, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -261,7 +262,6 @@ export default class WebRTC {
 
         this.requestAccessToDeviceSensors()
 
-        document.getElementById('permissions').addEventListener('click', this.requestAccessToDeviceSensors)
         document.getElementById('calibrate').addEventListener('click', () => {
             if (typeof DeviceOrientationEvent !== 'undefined' && window.god.orientation) {
                 window.removeEventListener('deviceorientation', this.handleDeviceOrientation, true);
@@ -272,10 +272,10 @@ export default class WebRTC {
         if( !this.experience.isMobile ) {
             await pc.setLocalDescription(await pc.createOffer());
 
-            pc.onicecandidate = ({ candidate }) => {
+            pc.onicecandidate = async ({ candidate }) => {
                 if (candidate) return;
 
-                fetch(__HANDSHAKE_HOST__, {
+                await fetch(__HANDSHAKE_HOST__, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -284,8 +284,12 @@ export default class WebRTC {
                             "offer": pc.localDescription.sdp
                         }
                     })
-                }).then(() => {
-                    this.generateQR(`${window.location.origin}/?id=${this.handshakeId}`)
+                }).then(async (response) => {
+                    await response.json()
+
+                    this.generateQR(`${window.location.origin}/?id=${this.handshakeId}`).then(() => {
+                        this.experience.html.qrcode.style.display = 'block';
+                    });
                 })
             };
         }
@@ -308,19 +312,22 @@ export default class WebRTC {
                 sdp: data.offer
             });
 
-            const answer = await pc.createAnswer();
-            await fetch(__HANDSHAKE_HOST__, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "id": this.handshakeId,
-                    data: {
-                        "answer": answer.sdp
-                    }
-                })
-            })
+            await pc.setLocalDescription(await pc.createAnswer());
 
-            await pc.setLocalDescription(answer);
+            pc.onicecandidate = ({ candidate }) => {
+                if (candidate) return;
+
+                fetch(__HANDSHAKE_HOST__, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "id": this.handshakeId,
+                        data: {
+                            "answer": pc.localDescription.sdp
+                        }
+                    })
+                })
+            };
         }
     }
 }

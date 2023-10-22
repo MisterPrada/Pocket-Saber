@@ -45,7 +45,16 @@ export default class Experience
         this.html = {}
         this.html.preloader = document.getElementById("preloader")
         this.html.playButton = document.getElementById("play-button")
+        this.html.qrcode = document.getElementById("qrcode")
+        this.html.saber = document.getElementById("saber")
+        this.html.permissions = document.getElementById("permissions")
+        this.html.calibrate = document.getElementById("calibrate")
+        this.html.ui = document.getElementById("ui")
+        this.html.uiMobile = document.getElementById("ui-mobile")
 
+        if ( this.isMobile ) {
+            this.html.uiMobile.style.display = "block";
+        }
 
         if(!this.targetElement)
         {

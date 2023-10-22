@@ -17,20 +17,38 @@ export default class World
         // Wait for resources
         this.resources.on('ready', () =>
         {
-            setTimeout(() => {
-                this.experience.time.start = Date.now()
-                this.experience.time.elapsed = 0
+            this.html.playButton.classList.add("fade-in");
 
-                // Setup
-                this.sound.createSounds()
+            this.html.playButton.addEventListener('click', () => {
+                // Send request to access device sensors
+                this.experience.webrtc.requestAccessToDeviceSensors();
 
-                this.saber = new Saber()
-                this.environment = new Environment()
-                // Remove preloader
+                setTimeout(() => {
+                    // Hide play button
+                    this.html.playButton.classList.replace("fade-in", "fade-out");
 
-                // Animation timeline
-                this.animationPipeline();
-            }, 100);
+
+                    this.experience.time.start = Date.now()
+                    this.experience.time.elapsed = 0
+
+                    // Setup
+                    this.sound.createSounds()
+
+                    this.saber = new Saber()
+                    this.environment = new Environment()
+                    // Remove preloader
+
+                    // Remove preloader
+                    this.html.preloader.classList.add("preloaded");
+                    setTimeout(() => {
+                        this.html.preloader.remove();
+                        this.html.playButton.remove();
+                    }, 2500);
+
+                    // Animation timeline
+                    this.animationPipeline();
+                }, 100);
+            }, { once: true })
         })
     }
 
