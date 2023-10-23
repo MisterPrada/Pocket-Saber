@@ -69,6 +69,7 @@ export default class WebRTC {
             }
         }
 
+
         // to string
         const string = JSON.stringify(data)
 
@@ -243,19 +244,21 @@ export default class WebRTC {
                 'color:yellow', 'color:orange', 'color:yellow', 'color:orange');
 
             if(pc.connectionState === 'connecting' && pc.signalingState != 'stable' && !this.experience.isMobile) {
-                const response = await fetch(__HANDSHAKE_HOST__, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        "id": this.handshakeId
+                setTimeout(async () => {
+                    const response = await fetch(__HANDSHAKE_HOST__, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "id": this.handshakeId
+                        })
                     })
-                })
-                const data = await response.json()
+                    const data = await response.json()
 
-                pc.setRemoteDescription({
-                    type: "answer",
-                    sdp: data.answer
-                })
+                    pc.setRemoteDescription({
+                        type: "answer",
+                        sdp: data.answer
+                    })
+                },3000);
             }
         }
         handleChange()
@@ -311,6 +314,7 @@ export default class WebRTC {
                 type: "offer",
                 sdp: data.offer
             });
+
 
             await pc.setLocalDescription(await pc.createAnswer());
 
