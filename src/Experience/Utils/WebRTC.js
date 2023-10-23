@@ -22,9 +22,9 @@ export default class WebRTC {
         }
 
         this.config = {
-            iceServers: [{
-                urls: "stun:stun.l.google.com:19302" // list of free STUN servers: https://gist.github.com/zziuni/3741933
-            }]
+            // iceServers: [{
+            //     urls: "stun:stun.l.google.com:19302" // list of free STUN servers: https://gist.github.com/zziuni/3741933
+            // }]
         };
 
         //this.initWebSocket()
