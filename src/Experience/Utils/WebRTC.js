@@ -171,7 +171,7 @@ export default class WebRTC {
         pc.oniceconnectionstatechange = ev => handleChange();
 
         const setAnswer = () => {
-            if( this.answer && this.ready && pc.signalingState !== 'stable' ) {
+            if( this.answer /* && this.ready && pc.signalingState !== 'stable' */) {
                 pc.setRemoteDescription(this.answer);
             }
         }
@@ -181,9 +181,9 @@ export default class WebRTC {
                 'color:yellow', 'color:orange', 'color:yellow', 'color:orange');
 
             if(pc.connectionState === 'connecting' && pc.signalingState !== 'stable' && !this.experience.isMobile) {
-                this.ready = true
-
-                setAnswer()
+                // this.ready = true
+                //
+                // setAnswer()
             }
         }
         handleChange();
