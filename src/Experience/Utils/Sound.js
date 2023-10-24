@@ -25,10 +25,10 @@ export default class Sound extends EventEmitter
 
     handleVisibilityChange() {
         if (this.isTabVisible()) {
-            this.backgroundSound.play();
+            this.saberIdleSound.play();
             this.listener.setMasterVolume(1)
         } else {
-            this.backgroundSound.pause();
+            this.saberIdleSound.pause();
             this.listener.setMasterVolume(0)
         }
     }

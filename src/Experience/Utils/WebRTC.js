@@ -22,13 +22,13 @@ export default class WebRTC {
         }
 
         this.config = {
-            // iceServers: [{
-            //     urls: "stun:stun.l.google.com:19302" // list of free STUN servers: https://gist.github.com/zziuni/3741933
-            // }]
+            iceServers: [{
+                urls: "stun:stun.l.google.com:19302" // list of free STUN servers: https://gist.github.com/zziuni/3741933
+            }]
         };
 
-        //this.initWebSocket()
-        this.initPHP()
+        this.initWebSocket()
+        //this.initPHP()
     }
 
     uuid = () => {
@@ -143,6 +143,173 @@ export default class WebRTC {
         this.dc = pc.createDataChannel("chat", {
             negotiated: true,
             id: 0
+        });
+
+        let handshakeId = new URLSearchParams(window.location.search).get("id");
+
+        const log = (msg) => { };
+        this.dc.onopen = () => { };
+        this.dc.onclose = () => log(`Closed`);
+        this.dc.onerror = err => log(`Error: ${err}`);
+
+        this.dc.onmessage = e => {
+            let data = JSON.parse(e.data)
+
+            if( data.orientation ) {
+                this.data.orientation = data.orientation;
+            }
+
+            if( data.motion ) {
+                this.data.motion = data.motion;
+            }
+        }
+        pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
+
+        pc.onconnectionstatechange = ev => handleChange();
+        pc.oniceconnectionstatechange = ev => handleChange();
+
+        const handleChange = async () => {
+            console.log('%c' + new Date().toISOString() + ': ConnectionState: %c' + pc.connectionState + ' %cIceConnectionState: %c' + pc.iceConnectionState,
+                'color:yellow', 'color:orange', 'color:yellow', 'color:orange');
+
+            if(pc.connectionState === 'connecting' && pc.signalingState != 'stable' && !this.experience.isMobile) {
+                pc.setRemoteDescription(this.answer);
+            }
+        }
+        handleChange();
+
+        this.requestAccessToDeviceSensors()
+
+        document.getElementById('permissions').addEventListener('click', this.requestAccessToDeviceSensors)
+        document.getElementById('calibrate').addEventListener('click', () => {
+            if (typeof DeviceOrientationEvent !== 'undefined' && this.data.orientation) {
+                window.removeEventListener('deviceorientation', this.handleDeviceOrientation, true);
+                window.addEventListener('deviceorientation', this.handleDeviceOrientation, true);
+            }
+        });
+
+        const ws = new WebSocket(`wss://${__SOCKET_HOST__}`);
+
+        ws.onopen = () => {
+            console.log('Connected to the signaling server');
+
+            if (handshakeId) {
+                // Если есть handshakeId, значит это мобильное устройство и оно должно сообщить серверу, что оно присоединяется к сессии
+                ws.send(JSON.stringify({
+                    type: 'JOIN_SESSION',
+                    handshakeId
+                }));
+            } else {
+                // Если нет handshakeId, мы на компьютере и должны создать новую сессию
+                handshakeId = this.uuid()
+
+                this.generateQR(`${window.location.origin}/?id=${handshakeId}`).then(() => {
+                    this.experience.html.qrcode.style.display = 'block';
+                    //console.log(`${window.location.origin}/?id=${handshakeId}`)
+                });
+
+                ws.send(JSON.stringify({
+                    type: 'CREATE_SESSION',
+                    handshakeId
+                }));
+            }
+        };
+
+        ws.onmessage = async (message) => {
+            const data = JSON.parse(message.data);
+
+            switch (data.type) {
+                case 'SESSION_CREATED':
+                    // Сессия создана, и мы ждем, когда мобильное устройство сканирует QR код и присоединяется к сессии
+                    console.log(`Session created with ID: ${handshakeId}`);
+                    break;
+                case 'SESSION_JOINED':
+                    // Мобильное устройство присоединилось к сессии, теперь можно начать обмен офферами и ответами
+                    console.log(`Device joined the session: ${handshakeId}`);
+
+                    // Создаем оффер только после того, как мобильное устройство присоединилось к сессии
+                    if (!this.experience.isMobile) {
+                        // Создание SDP-оффера
+                        pc.createOffer().then(offer => {
+                            pc.setLocalDescription(offer).then(() => {
+                                // Отправка оффера мобильному клиенту через сигнальный сервер
+                                ws.send(JSON.stringify({
+                                    type: 'OFFER',
+                                    handshakeId, // Используем handshakeId вместо targetClientId
+                                    sdp: pc.localDescription.sdp
+                                }));
+                            });
+                        });
+                    }
+                    break;
+                case 'OFFER':
+                    // Когда клиент получает оффер, он должен создать ответ (answer) и отправить его обратно
+                    if (this.experience.isMobile) {
+                        await pc.setRemoteDescription({
+                            type: 'offer',
+                            sdp: data.sdp
+                        });
+                        const answer = await pc.createAnswer();
+                        await pc.setLocalDescription(answer);
+
+                        ws.send(JSON.stringify({
+                            type: 'ANSWER',
+                            handshakeId,
+                            sdp: pc.localDescription.sdp
+                        }));
+                    } else {
+                        console.error('Received an offer, but the client is not a mobile device.');
+                    }
+                    break;
+                case 'ANSWER':
+                    // Когда инициирующий клиент получает ответ, он устанавливает удаленное описание
+                    if (!this.experience.isMobile) {
+                        // if (pc.signalingState !== 'stable') {
+                        //     console.error('The signaling state is not stable.');
+                        //     break;
+                        // }
+
+                        this.answer = {
+                            type: 'answer',
+                            sdp: data.sdp
+                        }
+                    } else {
+                        console.error('Received an answer, but the client is not the initiator.');
+                    }
+                    break;
+                case 'ICE_CANDIDATE':
+                    // Когда клиент получает ICE кандидата от другого клиента, он добавляет его к своему RTCPeerConnection
+                    if (data.candidate) {
+                        try {
+                            await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+                        } catch (e) {
+                            console.log('Error adding received ice candidate');
+                        }
+                    }
+                    break;
+
+
+                // Оставшиеся case обрабатываются так же, как вы ранее указали (OFFER, ANSWER, ICE_CANDIDATE и т.д.)
+            }
+        };
+
+        // Когда получаем кандидатов ICE от STUN/TURN сервера, отправляем их целевому клиенту
+        pc.onicecandidate = event => {
+            if (event.candidate) {
+                ws.send(JSON.stringify({
+                    type: 'ICE_CANDIDATE',
+                    handshakeId, // Используем handshakeId для идентификации сессии
+                    candidate: event.candidate
+                }));
+            }
+        };
+    }
+
+    async initWebSocket_() {
+        const pc = new RTCPeerConnection(this.config);
+        this.dc = pc.createDataChannel("chat", {
+            negotiated: true,
+            id: this.handshakeId
         });
         const log = (msg) => { };
         this.dc.onopen = () => { };
@@ -290,6 +457,8 @@ export default class WebRTC {
                 }).then(async (response) => {
                     await response.json()
 
+                    //console.log(`${window.location.origin}/?id=${this.handshakeId}`)
+
                     this.generateQR(`${window.location.origin}/?id=${this.handshakeId}`).then(() => {
                         this.experience.html.qrcode.style.display = 'block';
                     });
@@ -314,7 +483,6 @@ export default class WebRTC {
                 type: "offer",
                 sdp: data.offer
             });
-
 
             await pc.setLocalDescription(await pc.createAnswer());
 

@@ -7,7 +7,7 @@ const isCodeSandbox = 'SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in proc
 
 export default {
     define: {
-        __SOCKET_HOST__: `"${process.env.SOCKET_HOST}"`,
+        __SOCKET_HOST__: `"handshake.e2qr.com"`,
         __SOCKET_PORT__: `"${process.env.SOCKET_PORT}"`,
         __HANDSHAKE_HOST__: `"https://handshake.misterprada.com/"`,
     },
