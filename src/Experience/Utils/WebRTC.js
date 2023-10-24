@@ -289,7 +289,7 @@ export default class WebRTC {
                         try {
                             await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
                         } catch (e) {
-                            console.log('Error adding received ice candidate');
+                            console.error('Error adding received ice candidate', e);
                         }
                     }
                     break;
