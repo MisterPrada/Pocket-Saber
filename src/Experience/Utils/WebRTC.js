@@ -7,6 +7,9 @@ export default class WebRTC {
         this.handshakeId = this.uuid();
         //this.handshakeId = 'misterprada';
 
+        this.answer = undefined
+        this.ready = undefined
+
         this.data = {
             orientation: {
                 alpha: 63.0,
@@ -164,16 +167,23 @@ export default class WebRTC {
             }
         }
         pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
-
         pc.onconnectionstatechange = ev => handleChange();
         pc.oniceconnectionstatechange = ev => handleChange();
 
-        const handleChange = async () => {
+        const setAnswer = () => {
+            if( this.answer && this.ready ) {
+                pc.setRemoteDescription(this.answer);
+            }
+        }
+
+        const handleChange = () => {
             console.log('%c' + new Date().toISOString() + ': ConnectionState: %c' + pc.connectionState + ' %cIceConnectionState: %c' + pc.iceConnectionState,
                 'color:yellow', 'color:orange', 'color:yellow', 'color:orange');
 
             if(pc.connectionState === 'connecting' && pc.signalingState != 'stable' && !this.experience.isMobile) {
-                pc.setRemoteDescription(this.answer);
+                this.ready = true
+
+                setAnswer()
             }
         }
         handleChange();
@@ -262,17 +272,13 @@ export default class WebRTC {
                     }
                     break;
                 case 'ANSWER':
-                    // Когда инициирующий клиент получает ответ, он устанавливает удаленное описание
                     if (!this.experience.isMobile) {
-                        // if (pc.signalingState !== 'stable') {
-                        //     console.error('The signaling state is not stable.');
-                        //     break;
-                        // }
-
                         this.answer = {
                             type: 'answer',
                             sdp: data.sdp
                         }
+
+                        setAnswer()
                     } else {
                         console.error('Received an answer, but the client is not the initiator.');
                     }
