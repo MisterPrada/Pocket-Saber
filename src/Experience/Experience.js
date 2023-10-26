@@ -51,9 +51,11 @@ export default class Experience
         this.html.calibrate = document.getElementById("calibrate")
         this.html.ui = document.getElementById("ui")
         this.html.uiMobile = document.getElementById("ui-mobile")
+        this.html.saberActive = document.getElementById('saber-handle');
 
         if ( this.isMobile ) {
             this.html.uiMobile.style.display = "block";
+            this.html.saberActive.style.display = "block";
         }
 
         if(!this.targetElement)
